@@ -5,7 +5,8 @@ import multer from "multer";
 import { create, getAll, getOne, remove, update } from "./constrollers/PostController.js";
 import * as UserController from "./constrollers/UserController.js";
 import checkAuth from "./utils/checkAuth.js";
-import { postCreateValidation, registerValidation } from "./validations.js";
+import handleValidationErrors from "./utils/handleValidationErrors.js";
+import { loginValidation, postCreateValidation, registerValidation } from "./validations.js";
 
 mongoose
   .connect(
@@ -48,15 +49,15 @@ app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
 });
 
 // User
-app.post("/auth/register", registerValidation, UserController.register);
-app.post("/auth/login", UserController.login);
+app.post("/auth/register", registerValidation, handleValidationErrors, UserController.register);
+app.post("/auth/login", loginValidation, handleValidationErrors, UserController.login);
 app.get("/auth/me", checkAuth, UserController.getMe);
 
 // Posts
 app.get("/posts", getAll);
 app.get("/posts/:id", getOne);
-app.post("/posts", checkAuth, postCreateValidation, create);
-app.patch("/posts/:id", checkAuth, update);
+app.post("/posts", checkAuth, postCreateValidation, handleValidationErrors, create);
+app.patch("/posts/:id", checkAuth, postCreateValidation, handleValidationErrors, update);
 app.delete("/posts/:id", checkAuth, remove);
 
 // Launch server
