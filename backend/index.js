@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import multer from "multer";
 
 import { create, getAll, getOne, remove, update } from "./constrollers/PostController.js";
 import * as UserController from "./constrollers/UserController.js";
@@ -22,6 +23,30 @@ app.get("/", (req, res) => {
   res.send("Hello World!"); // Browser displays info
 });
 
+// Image upload handling
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./uploads");
+    // save to folder -> uploads
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+    // file name
+  },
+});
+
+const upload = multer({ storage });
+
+app.use("/uploads", express.static("uploads")); // express check if receive request for upload -> check if already have in folder -> if yes? show it in browser
+
+// Image upload
+app.post("/upload", checkAuth, upload.single("image"), (req, res) => {
+  res.json({
+    // return to client which address saved image (req.file = from middleware access image)
+    url: `uploads/${req.file.originalname}`,
+  });
+});
+
 // User
 app.post("/auth/register", registerValidation, UserController.register);
 app.post("/auth/login", UserController.login);
@@ -31,7 +56,7 @@ app.get("/auth/me", checkAuth, UserController.getMe);
 app.get("/posts", getAll);
 app.get("/posts/:id", getOne);
 app.post("/posts", checkAuth, postCreateValidation, create);
-app.patch("/posts/:id", update);
+app.patch("/posts/:id", checkAuth, update);
 app.delete("/posts/:id", checkAuth, remove);
 
 // Launch server
