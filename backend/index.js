@@ -2,10 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import multer from "multer";
 
-import { create, getAll, getOne, remove, update } from "./constrollers/PostController.js";
-import * as UserController from "./constrollers/UserController.js";
-import checkAuth from "./utils/checkAuth.js";
-import handleValidationErrors from "./utils/handleValidationErrors.js";
+import { PostController, UserController } from "./constrollers/index.js";
+import { checkAuth, handleValidationErrors } from "./utils/index.js";
 import { loginValidation, postCreateValidation, registerValidation } from "./validations.js";
 
 mongoose
@@ -54,11 +52,17 @@ app.post("/auth/login", loginValidation, handleValidationErrors, UserController.
 app.get("/auth/me", checkAuth, UserController.getMe);
 
 // Posts
-app.get("/posts", getAll);
-app.get("/posts/:id", getOne);
-app.post("/posts", checkAuth, postCreateValidation, handleValidationErrors, create);
-app.patch("/posts/:id", checkAuth, postCreateValidation, handleValidationErrors, update);
-app.delete("/posts/:id", checkAuth, remove);
+app.get("/posts", PostController.getAll);
+app.get("/posts/:id", PostController.getOne);
+app.post("/posts", checkAuth, postCreateValidation, handleValidationErrors, PostController.create);
+app.patch(
+  "/posts/:id",
+  checkAuth,
+  postCreateValidation,
+  handleValidationErrors,
+  PostController.update
+);
+app.delete("/posts/:id", checkAuth, PostController.remove);
 
 // Launch server
 app.listen(4444, (error) => {
