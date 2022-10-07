@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import LoginModal from '../Modals/LoginModal'
+import RegisterModal from '../Modals/RegisterModal'
 
 const Header = () => {
   const isAuth = false
+  const [isLoginOpen, setLoginIsOpen] = useState(false)
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false)
 
   return (
     <header className='bg-white'>
@@ -37,22 +41,39 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Link
+              <button
+                // to={'/login'}
+                className='bg-white border border-slate-300 py-1 px-4 rounded hover:text-slate-500'
+                onClick={() => setLoginIsOpen(true)}
+              >
+                Login
+              </button>
+              {/* <Link
                 to={'/login'}
                 className='bg-white border border-slate-300 py-1 px-4 rounded hover:text-slate-500'
               >
                 Login
-              </Link>
-              <Link
+              </Link> */}
+              <button
+                className='bg-indigo-500 text-white border border-transparent py-1 px-4 rounded hover:bg-indigo-500/90'
+                onClick={() => setIsRegisterOpen(true)}
+              >
+                Register
+              </button>
+              {/* <Link
                 to={'/register'}
                 className='bg-indigo-500 text-white border border-transparent py-1 px-4 rounded hover:bg-indigo-500/90'
               >
                 Register
-              </Link>
+              </Link> */}
             </>
           )}
         </div>
       </div>
+
+      {/* Modals */}
+      <LoginModal isLoginOpen={isLoginOpen} setLoginIsOpen={setLoginIsOpen} />
+      <RegisterModal isRegisterOpen={isRegisterOpen} setIsRegisterOpen={setIsRegisterOpen} />
     </header>
   )
 }
