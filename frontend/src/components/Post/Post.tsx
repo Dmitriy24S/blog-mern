@@ -1,24 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-
-interface PostPropsType {
-  id: number
-  title: string
-  bodyText: string
-  imageUrl: string
-  user: {
-    avatarUrl: string
-    fullName: string
-  }
-  createdAt: string
-  viewsCount: number
-  tags: string[]
-  isFullPost: boolean
-  index: number
-}
+import { PostType } from '../../redux/slices/postsSlice'
 
 const Post = ({
-  id,
+  _id,
   title,
   bodyText,
   imageUrl,
@@ -26,13 +11,9 @@ const Post = ({
   createdAt,
   viewsCount,
   tags,
-  // eslint-disable-next-line comma-dangle
   isFullPost,
-  // eslint-disable-next-line comma-dangle
-  index,
-}: PostPropsType) => {
-  console.log(isFullPost)
-
+  index
+}: PostType) => {
   return (
     <article className={`bg-white rounded shadow-sm ${isFullPost ? 'mt-12' : ''}`}>
       {imageUrl && (
@@ -53,7 +34,7 @@ const Post = ({
             <div className='time text-gray-500 text-sm'>{createdAt}</div>
           </div>
           <h2 className='text-3xl font-black hover:text-indigo-600'>
-            {!isFullPost ? <Link to={`/posts/${id}`}>{title}</Link> : title}
+            {!isFullPost ? <Link to={`/posts/${_id}`}>{title}</Link> : title}
           </h2>
           <p>{bodyText}</p>
           <div className='tags relative -left-4'>
