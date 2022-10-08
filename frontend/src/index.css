@@ -16,6 +16,12 @@
   text-size-adjust: 100%;
 }
 
+#root {
+  margin: 0 auto;
+  min-height: 100vh;
+  background: rgb(247 247 247);
+}
+
 a {
   font-weight: 500;
   text-decoration: inherit;
