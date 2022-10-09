@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import Post from '../../components/Post/Post'
+import PostSkeleton from '../../components/Post/PostSkeleton'
 import Tabs from '../../components/Tabs'
 import TagsBlock from '../../components/TagsBlock'
 import { fetchPosts, PostType } from '../../redux/slices/postsSlice'
@@ -24,13 +25,17 @@ const Home = () => {
   }, [])
 
   const isPostsLoading = posts.status === 'loading'
+  // const finalPosts = posts.items || [...Array(4)]
 
   return (
     <div className='home p-4'>
       <Tabs />
       <div className='posts-preview-container flex flex-col-reverse md:grid sm:grid-cols-3 gap-4 md:items-start'>
         <div className='posts-preview-container flex flex-col gap-4 col-span-2'>
-          {isPostsLoading && <h1>Loading</h1>}
+          {/* If loading posts -> show posts skeleton */}
+          {isPostsLoading &&
+            [...Array(4)].map((_item, idx) => <PostSkeleton key={idx} isFullPost={false} />)}
+          {/* If have posts -> show posts */}
           {posts &&
             posts.items.map((item: PostType, index) => (
               <Post

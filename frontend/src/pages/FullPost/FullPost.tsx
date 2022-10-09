@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from '../../axios/axios'
 import Post from '../../components/Post/Post'
+import PostSkeleton from '../../components/Post/PostSkeleton'
 import { PostType } from '../../redux/slices/postsSlice'
 
 const FullPost = () => {
@@ -9,10 +10,12 @@ const FullPost = () => {
   console.log(params) // {id: '0'}
 
   const [fullPostData, setFullPostData] = useState<PostType>()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchSinglePostData = async () => {
       try {
+        setIsLoading(true)
         const { data } = await axios.get(`/posts/${params.id}`)
         console.log(data)
         setFullPostData(data)
@@ -30,6 +33,7 @@ const FullPost = () => {
         alert('Failed to load post')
         console.log(error)
       }
+      setIsLoading(false)
     }
     fetchSinglePostData()
   }, [])
@@ -38,6 +42,9 @@ const FullPost = () => {
 
   return (
     <>
+      {/* if loading -> show skeleon */}
+      {isLoading && <PostSkeleton isFullPost={true} />}
+      {/* if have post data -> show post */}
       {fullPostData && (
         <Post
           _id={fullPostData._id}
