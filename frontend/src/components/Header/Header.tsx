@@ -1,12 +1,18 @@
 import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { checkIsAuth, logOut } from '../../redux/slices/authSlice'
 import LoginModal from '../Modals/LoginModal'
 import RegisterModal from '../Modals/RegisterModal'
 
 const Header = () => {
-  const isAuth = false
+  const dispatch = useDispatch()
+
   const [isLoginOpen, setLoginIsOpen] = useState(false)
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
+
+  const isAuth = useSelector(checkIsAuth)
+  // console.log(isAuth, 'check auth - Header')
 
   return (
     <header className='bg-white'>
@@ -21,7 +27,7 @@ const Header = () => {
         </div>
 
         {/* Login / Register */}
-        <div className='header-user flex gap-5'>
+        <div className='header-user flex gap-5 items-center'>
           {/* eslint: */}
           {/* {isAuth
             ? <>
@@ -36,8 +42,18 @@ const Header = () => {
           {/* eslint-disable-next-line multiline-ternary */}
           {isAuth ? (
             <>
-              <Link to={'/posts/create'}>Create Post</Link>
-              <button>Logout</button>
+              <Link
+                to={'/posts/create'}
+                className='bg-indigo-500 text-white px-4 h-full py-1 rounded hover:bg-indigo-600'
+              >
+                Create Post
+              </Link>
+              <button
+                className='text-stone-500 hover:text-black py-1 px-4 rounded'
+                onClick={() => dispatch(logOut())}
+              >
+                Logout
+              </button>
             </>
           ) : (
             <>

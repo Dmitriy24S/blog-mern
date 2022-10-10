@@ -1,5 +1,9 @@
 import { Dialog, Transition } from '@headlessui/react'
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
+import { checkIsAuth, fetchUserData } from '../../redux/slices/authSlice'
+import { useAppDispatch } from '../../redux/store'
 
 interface LoginProps {
   isLoginOpen: boolean
@@ -7,7 +11,68 @@ interface LoginProps {
 }
 
 const LoginModal = ({ isLoginOpen, setLoginIsOpen }: LoginProps) => {
-  //   const [isLoginOpen, setLoginIsOpen] = useState(true)
+  const dispatch = useAppDispatch()
+
+  const isAuth = useSelector(checkIsAuth)
+  // console.log(isAuth, 'check auth - Login modal')
+
+  // If recieve user data -> successful login -> close login modal:
+  useEffect(() => {
+    if (isAuth) {
+      setLoginIsOpen(false)
+    }
+  }, [isAuth])
+
+  const {
+    register,
+    handleSubmit,
+    // setError,
+    formState: { errors }
+    // formState
+  } = useForm({
+    defaultValues: {
+      email: 'johndoe@test.com',
+      password: '12345z2'
+
+      // wrong email:
+      // POST http://localhost:4444/auth/login 500 (Internal Server Error)
+      // {message: "Unable to login"}
+      // message:"Unable to login"
+
+      // wrong password:
+      // POST http://localhost:4444/auth/login 404 (Not Found)
+      // {message: "Incorrect login or password"} // ! change? different error message email vs password
+      // message:"Incorrect login or password"
+
+      // when not complete email:
+      // POST http://localhost:4444/auth/login 400 (Bad Request)
+      // 0: {value: "johndoe@test", msg: "Wrong email format", param: "email", location: "body"}
+      // location:"body"
+      // msg:"Wrong email format"
+      // param:"email"
+      // value:"johndoe@test"
+
+      // on success:
+      // async fetch user data slice
+      // {token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M…E0N30.OClDexzI-ZCytC3uoac2X9JEA_Rpb7ma6UVo4-FlrMI', _id: '633b2144ad263568ee0fff69', fullName: 'John Doe', email: 'johndoe@test.com', avatarUrl: 'https://www.resetera.com/forums/etcetera-forum.9/z', …}
+      // avatarUrl: "https://www.resetera.com/forums/etcetera-forum.9/z"
+      // createdAt : "2022-10-03T17:52:04.346Z"
+      // email: "johndoe@test.com"
+      // fullName: "John Doe"
+      // token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzNiMjE0NGFkMjYzNTY4ZWUwZmZmNjkiLCJpYXQiOjE2NjUzODExNDcsImV4cCI6MTY2Nzk3MzE0N30.OClDexzI-ZCytC3uoac2X9JEA_Rpb7ma6UVo4-FlrMI"
+      // updatedAt: "2022-10-03T17:52:04.346Z"
+      // __v:0
+      // _id:"633b2144ad263568ee0fff69"
+    }
+  })
+
+  const onSubmit = (values: any) => {
+    console.log(values)
+    // {email: 'dfsdfsdf@dsfsd', password: 'sdfsdfsdfsd'}
+    // email:"dfsdfsdf@dsfsd"
+    // password:"sdfsdfsdfsd"
+    dispatch(fetchUserData(values))
+  }
 
   return (
     <Transition appear show={isLoginOpen} as={Fragment}>
@@ -44,21 +109,45 @@ const LoginModal = ({ isLoginOpen, setLoginIsOpen }: LoginProps) => {
               <Dialog.Title className='text-center mb-8 text-indigo-600 text-3xl font-bold'>
                 Login
               </Dialog.Title>
-              <form className='flex flex-col gap-6'>
-                <input
-                  type='text'
-                  placeholder='Enter your email'
-                  className='px-4 py-2 border border-slate-200'
-                />
-                <input
-                  type='password'
-                  placeholder='Enter your password'
-                  className='px-4 py-2 border border-slate-200'
-                />
+              <form className='flex flex-col' onSubmit={handleSubmit(onSubmit)}>
+                <div className='mb-6'>
+                  {/* Email input */}
+                  <input
+                    id='email'
+                    type='email'
+                    placeholder='Enter your email'
+                    className={`px-4 py-2 border border-slate-200 w-full ${
+                      errors?.email && 'border-red-600'
+                    }`}
+                    {...register('email', { required: 'Please enter email' })}
+                  />
+                  {/* input error msg */}
+                  {errors?.email && (
+                    <p className='text-red-600 tracking-wider ml-4 mt-2'>{errors.email.message}</p>
+                  )}
+                </div>
+                {/* Password input */}
+                <div>
+                  <input
+                    id='password'
+                    type='password'
+                    placeholder='Enter your password'
+                    className={`px-4 py-2 border border-slate-200 w-full ${
+                      errors?.password && 'border-red-600'
+                    }`}
+                    {...register('password', { required: 'Please enter password' })}
+                  />
+                  {/* input error msg */}
+                  {errors?.password && (
+                    <p className='text-red-600 tracking-wider ml-4 mt-2'>
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
                 <button
                   type='submit'
-                  onClick={() => setLoginIsOpen(false)}
-                  className='bg-indigo-600 text-white mt-1 hover:bg-indigo-500'
+                  // onClick={() => setLoginIsOpen(false)}
+                  className='bg-indigo-600 text-white hover:bg-indigo-500 mt-6'
                 >
                   Login
                 </button>
