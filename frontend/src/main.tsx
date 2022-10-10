@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <BrowserRouter>
     <Provider store={store}>
       <Header />
-      <div className='wrapper max-w-6xl mx-auto'>
+      <div className='wrapper max-w-6xl mx-auto px-4'>
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/posts/:id' element={<FullPost />} />

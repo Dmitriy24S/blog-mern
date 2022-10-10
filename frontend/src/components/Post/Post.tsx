@@ -1,3 +1,4 @@
+/* eslint-disable multiline-ternary */
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { PostType } from '../../redux/slices/postsSlice'
@@ -33,8 +34,14 @@ const Post = ({
             <div className='name font-bold'>{user.fullName}</div>
             <div className='time text-gray-500 text-sm'>{createdAt}</div>
           </div>
-          <h2 className='text-3xl font-black hover:text-indigo-600'>
-            {!isFullPost ? <Link to={`/posts/${_id}`}>{title}</Link> : title}
+          <h2 className='text-3xl font-black'>
+            {!isFullPost ? (
+              <Link to={`/posts/${_id}`} className='text-3xl font-black hover:text-indigo-600'>
+                {title}
+              </Link>
+            ) : (
+              title
+            )}
           </h2>
           <p>{bodyText}</p>
           <div className='tags relative -left-4'>
@@ -69,7 +76,7 @@ const Post = ({
               >
                 <path d='M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z'></path>
               </svg>
-              4
+              0
             </button>
           </div>
         </div>
