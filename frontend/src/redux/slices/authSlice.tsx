@@ -90,6 +90,20 @@ export const authSlice = createSlice({
       state.userData = null
       state.status = 'error'
     })
+    // registerUser:
+    builder.addCase(registerUser.pending, (state) => {
+      state.userData = null
+      state.status = 'loading'
+    })
+    builder.addCase(registerUser.fulfilled, (state, action) => {
+      console.log('Auth Reducer / Slice - register user data payload', action.payload)
+      state.userData = action.payload
+      state.status = 'done'
+    })
+    builder.addCase(registerUser.rejected, (state) => {
+      state.userData = null
+      state.status = 'error'
+    })
   }
 })
 
