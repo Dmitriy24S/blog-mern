@@ -14,6 +14,14 @@ const Header = () => {
   const isAuth = useSelector(checkIsAuth)
   // console.log(isAuth, 'check auth - Header')
 
+  const handleLogOut = () => {
+    if (window.confirm('Are you sure you want to log out?')) {
+      dispatch(logOut())
+      // delete token after log out
+      window.localStorage.removeItem('token')
+    }
+  }
+
   return (
     <header className='bg-white'>
       <div className='header-content-container max-w-6xl mx-auto header flex justify-between items-center py-2 px-4'>
@@ -49,8 +57,8 @@ const Header = () => {
                 Create Post
               </Link>
               <button
-                className='text-stone-500 hover:text-black py-1 px-4 rounded'
-                onClick={() => dispatch(logOut())}
+                className='text-stone-500 hover:text-black py-1 px-4 rounded bg-white border border-slate-300'
+                onClick={handleLogOut}
               >
                 Logout
               </button>

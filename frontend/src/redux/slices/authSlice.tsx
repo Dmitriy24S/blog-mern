@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from '../../axios/axios'
 import { RootState } from '../store'
 
-interface UserDataType {
+export interface UserDataType {
   avatarUrl: string
   createdAt: string
   email: string
@@ -13,7 +13,8 @@ interface UserDataType {
   _id: string
 }
 
-interface authParams {
+export interface authParams {
+  name?: string
   email: string
   password: string
 }
@@ -26,6 +27,18 @@ interface AuthSliceInitialStateType {
 export const fetchUserData = createAsyncThunk('auth/fetchUserData', async (params: authParams) => {
   const { data } = await axios.post('/auth/login', params)
   console.log('async fetch user data slice:', data)
+  return data as UserDataType
+})
+
+export const fetchAuthMe = createAsyncThunk('auth/fetchAuthMe', async () => {
+  const { data } = await axios.get('/auth/me') // axios already has token inside from localstorage and passes it !?
+  console.log('async fetch auth me slice:', data)
+  return data as UserDataType
+})
+
+export const registerUser = createAsyncThunk('/auth/registerUser', async (params: authParams) => {
+  const { data } = await axios.post('/auth/register', params)
+  console.log('async register user slice:', data)
   return data as UserDataType
 })
 
@@ -49,6 +62,7 @@ export const authSlice = createSlice({
     // },
   },
   extraReducers: (builder) => {
+    // fetchUserData:
     builder.addCase(fetchUserData.pending, (state) => {
       state.userData = null
       state.status = 'loading'
@@ -59,6 +73,20 @@ export const authSlice = createSlice({
       state.status = 'done'
     })
     builder.addCase(fetchUserData.rejected, (state) => {
+      state.userData = null
+      state.status = 'error'
+    })
+    // fetchAuthMe:
+    builder.addCase(fetchAuthMe.pending, (state) => {
+      state.userData = null
+      state.status = 'loading'
+    })
+    builder.addCase(fetchAuthMe.fulfilled, (state, action) => {
+      console.log('Auth Reducer / Slice - fetch auth me data payload', action.payload)
+      state.userData = action.payload
+      state.status = 'done'
+    })
+    builder.addCase(fetchAuthMe.rejected, (state) => {
       state.userData = null
       state.status = 'error'
     })
