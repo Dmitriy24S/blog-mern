@@ -2,7 +2,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import React, { Fragment, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
-import { authParams, checkIsAuth, registerUser, UserDataType } from '../../redux/slices/authSlice'
+import { authParams, checkIsAuth, registerUser } from '../../redux/slices/authSlice'
 import { useAppDispatch } from '../../redux/store'
 
 interface RegisterProps {
@@ -17,6 +17,7 @@ const RegisterModal = ({ isRegisterOpen, setIsRegisterOpen }: RegisterProps) => 
 
   // If recieve user data -> successful registration -> close register modal:
   useEffect(() => {
+    console.log('isAuth useEffect:', isAuth)
     if (isAuth) {
       setIsRegisterOpen(false)
     }
@@ -25,59 +26,100 @@ const RegisterModal = ({ isRegisterOpen, setIsRegisterOpen }: RegisterProps) => 
   const {
     register,
     handleSubmit,
-    // setError,
+    setError,
+    clearErrors,
     formState: { errors }
     // formState
   } = useForm({
     defaultValues: {
-      fullName: 'john doe 2',
-      email: 'johndoe2@test.com',
-      password: '12345z2'
+      fullName: 'john doe 3',
+      // fullName: 'john doe 2',
+      // fullName: 'jo',
+      // email: 'johndoe2@test.com',
+      email: 'johndoe3@test.com',
+      password: '12345z2',
+      // password: '12'
+      undefined: ''
     }
   })
 
+  console.log({ errors })
+  // {errors: {…}}
+  // errors:
+  // undefined: {type: 'server', message: 'Unable to register', ref: undefined}
+
   const onSubmit = async (values: authParams) => {
+    console.log('Registration submit')
+    // clearErrors()
+
     // console.log(values)
     // {email: 'dfsdfsdf@dsfsd', password: 'sdfsdfsdfsd'}
     // email:"dfsdfsdf@dsfsd"
     // password:"sdfsdfsdfsd"
     // dispatch(fetchUserData(values))
 
-    const data = await dispatch(registerUser(values))
-    console.log('on submit payload data await', data)
-    // avatarUrl: 'https://www.resetera.com/forums/etcetera-forum.9/z'
-    // createdAt: '2022-10-03T17:52:04.346Z'
-    // email: 'johndoe@test.com'
-    // fullName: 'John Doe'
-    // token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzNiMjE0NGFkMjYzNTY4ZWUwZmZmNjkiLCJpYXQiOjE2NjU0MDAwMzgsImV4cCI6MTY2Nzk5MjAzOH0.r8n7fAMj-3xkdHckd5hkOSxqs7s7UWyaEyp-RjKup-U'
-    // updatedAt: '2022-10-03T17:52:04.346Z'
-    // __v: 0
-    // _id: '633b2144ad263568ee0fff69'
+    try {
+      // const data = await dispatch(registerUser(values))
+      const data = await dispatch(registerUser(values)).unwrap() // ! .unwrap() to access error throw? with catch? otherwise not reach catch?
+      console.log('Modal submit - data await:', data)
 
-    const payload = data.payload as UserDataType
+      // avatarUrl: 'https://www.resetera.com/forums/etcetera-forum.9/z'
+      // createdAt: '2022-10-03T17:52:04.346Z'
+      // email: 'johndoe@test.com'
+      // fullName: 'John Doe'
+      // token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzNiMjE0NGFkMjYzNTY4ZWUwZmZmNjkiLCJpYXQiOjE2NjU0MDAwMzgsImV4cCI6MTY2Nzk5MjAzOH0.r8n7fAMj-3xkdHckd5hkOSxqs7s7UWyaEyp-RjKup-U'
+      // updatedAt: '2022-10-03T17:52:04.346Z'
+      // __v: 0
+      // _id: '633b2144ad263568ee0fff69'
 
-    if (!payload) {
-      alert('Failed to register?')
-    }
+      // const payload = data.payload as UserDataType
 
-    // save token to localStorage
-    if ('token' in payload) {
-      window.localStorage.setItem('token', payload.token)
+      if (!data) {
+        alert('Failed to register?')
+      }
+
+      if ('token' in data) {
+        window.localStorage.setItem('token', data.token)
+      }
+    } catch (error: any) {
+      console.log('Modal error message:', JSON.parse(error.message))
+      //  [{"value":"12",
+      // "msg": "Password must be at least 5 symbols",
+      // "param": "password",
+      // "location":"body"},
+      // {"value":"jo",
+      // "msg":"Name is required",
+      // "param":"fullName",
+      // "location":"body"}]
+
+      const errorArr = JSON.parse(error.message)
+      errorArr.forEach((err: any) => {
+        console.log('errorArr - Error forEach', err)
+        // {value: '12', msg: 'Password must be at least 5 symbols', param: 'password', location: 'body'}
+        // location: "body"
+        // msg: "Password must be at least 5 symbols"
+        // param: "password"
+        // value: "12"
+        setError(err.param, {
+          type: 'server',
+          message: err.msg
+        })
+      })
     }
   }
 
-  // my payload or hz:
+  // payload:
   // {name: "john doe 2", email: "johndoe2@test.com", password: "12345z2"}
   // email: "johndoe2@test.com"
   // name: "john doe 2"
   // password: "12345z2"
 
-  // console: why no meeesage mesa he ot name wtkfel
+  // console: no error message
   // POST http://localhost:4444/auth/register 400 (Bad Request)
   // error: {name: 'AxiosError', message: 'Request failed with status code 400', stack: 'AxiosError: Re
   //  TypeError: Cannot use 'in' operator to search for 'token' in undefined
 
-  // in network:
+  // in network: has message
   // [{msg: "Name is required", param: "fullName", location: "body"}]
   // 0: {msg: "Name is required", param: "fullName", location: "body"}
   // location: "body"
@@ -117,7 +159,13 @@ const RegisterModal = ({ isRegisterOpen, setIsRegisterOpen }: RegisterProps) => 
               <Dialog.Title className='text-center mb-8 text-indigo-600 text-3xl font-bold'>
                 Register
               </Dialog.Title>
-              <form className='flex flex-col' onSubmit={handleSubmit(onSubmit)}>
+              <form
+                className='flex flex-col'
+                onSubmit={(e) => {
+                  clearErrors() // to keep form register submit attempt work after 1st error otherwise stops submitting
+                  handleSubmit(onSubmit)(e)
+                }}
+              >
                 <div className='mb-6'>
                   {/* Name input */}
                   <input
@@ -125,7 +173,7 @@ const RegisterModal = ({ isRegisterOpen, setIsRegisterOpen }: RegisterProps) => 
                     type='text'
                     placeholder='Please enter your name'
                     className={`px-4 py-2 border border-slate-200 w-full ${
-                      errors?.email && 'border-red-600'
+                      errors?.fullName && 'border-red-600'
                     }`}
                     // {...register('name', { required: 'Please enter your name' })}
                     {...register('fullName', { required: 'Please enter your name' })}
@@ -171,6 +219,12 @@ const RegisterModal = ({ isRegisterOpen, setIsRegisterOpen }: RegisterProps) => 
                     </p>
                   )}
                 </div>
+                {/* error undefined (when submit -> user/email? already exists error response) */}
+                {errors?.undefined && (
+                  <p className='text-red-600 tracking-wider ml-4 mt-2'>
+                    {errors.undefined.message}
+                  </p>
+                )}
                 <button type='submit' className='bg-indigo-600 text-white hover:bg-indigo-500 mt-6'>
                   Register
                 </button>

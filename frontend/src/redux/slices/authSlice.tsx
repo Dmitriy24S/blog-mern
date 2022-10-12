@@ -37,9 +37,21 @@ export const fetchAuthMe = createAsyncThunk('auth/fetchAuthMe', async () => {
 })
 
 export const registerUser = createAsyncThunk('/auth/registerUser', async (params: authParams) => {
-  const { data } = await axios.post('/auth/register', params)
-  console.log('async register user slice:', data)
-  return data as UserDataType
+  try {
+    const { data } = await axios.post('/auth/register', params)
+    console.log('REDUX - async register user data:', data)
+    // return data as UserDataType // ! error -> because added unwrap() to async in registerModal?
+    return data
+  } catch (error: any) {
+    // TODO: type any?
+    console.log('REDUX - catch error.response', error.response)
+    // error.response.data:
+    // (2)[{…}, {…}]0:
+    // {value: '12', msg: 'Password must be at least 5 symbols', param: 'password', location: 'body'}
+    // 1: {value: 'jo', msg: 'Name is required', param: 'fullName', location: 'body'}
+
+    throw new Error(JSON.stringify(error.response.data))
+  }
 })
 
 const initialState: AuthSliceInitialStateType = {
@@ -103,6 +115,7 @@ export const authSlice = createSlice({
     builder.addCase(registerUser.rejected, (state) => {
       state.userData = null
       state.status = 'error'
+      //   mess returnnug msg i kak coplete mess login fake mes nado kakto hz fk
     })
   }
 })

@@ -1,11 +1,11 @@
-import bcrypt from "bcrypt";
-import { validationResult } from "express-validator";
-import jwt from "jsonwebtoken";
-import UserModel from "../models/User.js";
+import bcrypt from 'bcrypt'
+import { validationResult } from 'express-validator'
+import jwt from 'jsonwebtoken'
+import UserModel from '../models/User.js'
 
 export const register = async (req, res) => {
   try {
-    console.log(req.body);
+    console.log('req.body:', req.body)
 
     // (refactored into separate middleware):
     // const errors = validationResult(req); // ?
@@ -27,9 +27,9 @@ export const register = async (req, res) => {
     // 	}
     // ^ (refactored into separate middleware)
 
-    const password = req.body.password;
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt); // enrypt password
+    const password = req.body.password
+    const salt = await bcrypt.genSalt(10)
+    const hash = await bcrypt.hash(password, salt) // enrypt password
 
     const doc = new UserModel({
       email: req.body.email,
@@ -37,32 +37,32 @@ export const register = async (req, res) => {
       avatarUrl: req.body.avatarUrl,
       // password: req.body.password,
       // passwordHash: req.body.password,
-      passwordHash: hash,
-    });
+      passwordHash: hash
+    })
 
     // create in mongoDB
-    const user = await doc.save();
+    const user = await doc.save()
 
     // encrypt password? / new token?
     const token = jwt.sign(
       {
-        _id: user._id,
+        _id: user._id
       },
-      "secret123",
+      'secret123',
       {
-        expiresIn: "30d",
+        expiresIn: '30d'
       }
-    );
+    )
 
     // prevent password return
-    const { passwordHash, ...userData } = user._doc;
+    const { passwordHash, ...userData } = user._doc
 
     // if all ok:
     res.json({
       token,
       success: true,
-      ...userData,
-    });
+      ...userData
+    })
     // {
     //     "success": true,
     //     "user": {
@@ -77,53 +77,59 @@ export const register = async (req, res) => {
     //     }
     // }
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: "Unable to register",
-    });
+    console.log(error)
+    res.status(500).json([
+      {
+        // test: {
+        // message: 'Unable to register',
+        msg: 'Unable to register',
+        error
+        // }
+      }
+    ])
   }
-};
+}
 
 export const login = async (req, res) => {
   try {
-    const user = await UserModel.findOne({ email: req.body.email });
+    const user = await UserModel.findOne({ email: req.body.email })
 
     if (!user) {
       // if not in DB return error & add 'return' to stop future code
       return req.status(404).json({
-        message: "User not found",
-      });
+        message: 'User not found'
+      })
     }
 
     // compare password?
-    const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash);
+    const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash)
 
     if (!isValidPass) {
       // if not valid password:
       return res.status(404).json({
-        message: "Incorrect login or password",
-      });
+        message: 'Incorrect login or password'
+      })
     }
 
     // encrypt password? / new token?
     const token = jwt.sign(
       {
-        _id: user._id,
+        _id: user._id
       },
-      "secret123",
+      'secret123',
       {
-        expiresIn: "30d",
+        expiresIn: '30d'
       }
-    );
+    )
 
     // prevent password return
-    const { passwordHash, ...userData } = user._doc;
+    const { passwordHash, ...userData } = user._doc
 
     // if all ok:
     res.json({
       token,
-      ...userData,
-    });
+      ...userData
+    })
     // {
     // 	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzNiMjE0NGFkMjYzNTY4ZWUwZmZmNjkiLCJpYXQiOjE2NjQ4MjAyMTcsImV4cCI6MTY2NzQxMjIxN30.hSMVyzQubEWIj_PNKoAuBeVgnICHfUo_buKgSAzfKQo",
     // 	"_id": "633b2144ad263568ee0fff69",
@@ -135,34 +141,34 @@ export const login = async (req, res) => {
     // 	"__v": 0
     // }
   } catch (error) {
-    console.log(error);
+    console.log(error)
     res.status(500).json({
-      message: "Unable to login",
-    });
+      message: 'Unable to login'
+    })
   }
-};
+}
 
 export const getMe = async (req, res) => {
   try {
     // after success middleware checkAuth & decoded id
-    const user = await UserModel.findById(req.userId);
+    const user = await UserModel.findById(req.userId)
 
     if (!user) {
       // if user not found
       return res.status(404).json({
-        message: "User not found",
-      });
+        message: 'User not found'
+      })
     }
 
     // prevent return passowrd
-    const { passwordHash, ...userData } = user._doc;
+    const { passwordHash, ...userData } = user._doc
 
     // if all ok:
     res.json({
       success: true,
       user,
-      ...userData,
-    });
+      ...userData
+    })
     //   {
     // 	"success": true,
     // 	"user": {
@@ -185,7 +191,7 @@ export const getMe = async (req, res) => {
     // }
   } catch (error) {
     res.status(500).json({
-      message: "Unable to get user",
-    });
+      message: 'Unable to get user'
+    })
   }
-};
+}
