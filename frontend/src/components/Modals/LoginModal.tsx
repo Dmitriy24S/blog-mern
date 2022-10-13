@@ -132,13 +132,19 @@ const LoginModal = ({ isLoginOpen, setLoginIsOpen }: LoginProps) => {
                 Login
               </Dialog.Title>
               <form className='flex flex-col' onSubmit={handleSubmit(onSubmit)}>
-                <div className='mb-6'>
+                <div className='mb-6 relative'>
                   {/* Email input */}
+                  <label
+                    htmlFor='email'
+                    className='relative -bottom-2 ml-3 inline-block px-1 bg-white text-indigo-500'
+                  >
+                    Email
+                  </label>
                   <input
                     id='email'
                     type='email'
                     placeholder='Enter your email'
-                    className={`px-4 py-2 border border-slate-200 w-full ${
+                    className={`px-4 pb-2 pt-3 border border-slate-200 w-full ${
                       errors?.email && 'border-red-600'
                     }`}
                     {...register('email', { required: 'Please enter email' })}
@@ -149,12 +155,18 @@ const LoginModal = ({ isLoginOpen, setLoginIsOpen }: LoginProps) => {
                   )}
                 </div>
                 {/* Password input */}
-                <div>
+                <div className='relative'>
+                  <label
+                    htmlFor='password'
+                    className='relative -bottom-2 ml-3 inline-block px-1 bg-white text-indigo-500'
+                  >
+                    Password
+                  </label>
                   <input
                     id='password'
                     type='password'
                     placeholder='Enter your password'
-                    className={`px-4 py-2 border border-slate-200 w-full ${
+                    className={`px-4 pb-2 pt-3 border border-slate-200 w-full ${
                       errors?.password && 'border-red-600'
                     }`}
                     {...register('password', { required: 'Please enter password' })}

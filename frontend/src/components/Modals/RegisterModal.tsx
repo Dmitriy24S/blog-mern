@@ -166,13 +166,19 @@ const RegisterModal = ({ isRegisterOpen, setIsRegisterOpen }: RegisterProps) => 
                   handleSubmit(onSubmit)(e)
                 }}
               >
-                <div className='mb-6'>
+                <div className='mb-6 relative'>
                   {/* Name input */}
+                  <label
+                    htmlFor='name'
+                    className='relative -bottom-2 ml-3 inline-block px-1 bg-white text-indigo-500'
+                  >
+                    Name
+                  </label>
                   <input
                     id='name'
                     type='text'
-                    placeholder='Please enter your name'
-                    className={`px-4 py-2 border border-slate-200 w-full ${
+                    placeholder='John Doe'
+                    className={`px-4 pb-2 pt-3 border border-slate-200 w-full ${
                       errors?.fullName && 'border-red-600'
                     }`}
                     // {...register('name', { required: 'Please enter your name' })}
@@ -185,16 +191,23 @@ const RegisterModal = ({ isRegisterOpen, setIsRegisterOpen }: RegisterProps) => 
                     </p>
                   )}
                 </div>
-                <div className='mb-6'>
+                <div className='mb-6 relative'>
                   {/* Email input */}
+                  <label
+                    htmlFor='email'
+                    className='relative -bottom-2 ml-3 inline-block px-1 bg-white text-indigo-500'
+                  >
+                    Email
+                  </label>
                   <input
                     id='email'
                     type='email'
-                    placeholder='Enter your email'
-                    className={`px-4 py-2 border border-slate-200 w-full ${
+                    placeholder='johndoe@email.com'
+                    className={`px-4 pb-2 pt-3 border border-slate-200 w-full ${
                       errors?.email && 'border-red-600'
                     }`}
                     {...register('email', { required: 'Please enter email' })}
+                    onFocus={() => console.log('focus')}
                   />
                   {/* input error msg */}
                   {errors?.email && (
@@ -202,12 +215,18 @@ const RegisterModal = ({ isRegisterOpen, setIsRegisterOpen }: RegisterProps) => 
                   )}
                 </div>
                 {/* Password input */}
-                <div>
+                <div className='relative'>
+                  <label
+                    htmlFor='password'
+                    className='relative -bottom-2 ml-3 inline-block px-1 bg-white text-indigo-500'
+                  >
+                    Password
+                  </label>
                   <input
                     id='password'
                     type='password'
                     placeholder='Enter your password'
-                    className={`px-4 py-2 border border-slate-200 w-full ${
+                    className={`px-4 pb-2 pt-3 border border-slate-200 w-full ${
                       errors?.password && 'border-red-600'
                     }`}
                     {...register('password', { required: 'Please enter password' })}
