@@ -96,8 +96,9 @@ export const login = async (req, res) => {
 
     if (!user) {
       // if not in DB return error & add 'return' to stop future code
-      return req.status(404).json({
-        message: 'User not found'
+      return res.status(404).json({
+        // message: 'User not found'
+        msg: 'User not found'
       })
     }
 
@@ -107,7 +108,8 @@ export const login = async (req, res) => {
     if (!isValidPass) {
       // if not valid password:
       return res.status(404).json({
-        message: 'Incorrect login or password'
+        // message: 'Incorrect login or password'
+        msg: 'Incorrect login or password'
       })
     }
 
@@ -143,7 +145,8 @@ export const login = async (req, res) => {
   } catch (error) {
     console.log(error)
     res.status(500).json({
-      message: 'Unable to login'
+      // message: 'Unable to login'
+      msg: 'Unable to login'
     })
   }
 }

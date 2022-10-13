@@ -25,9 +25,16 @@ interface AuthSliceInitialStateType {
 }
 
 export const fetchUserData = createAsyncThunk('auth/fetchUserData', async (params: authParams) => {
-  const { data } = await axios.post('/auth/login', params)
-  console.log('async fetch user data slice:', data)
-  return data as UserDataType
+  try {
+    const { data } = await axios.post('/auth/login', params)
+    console.log('async fetch user data slice:', data)
+    // return data as UserDataType
+    return data
+  } catch (error: any) {
+    // TODO: type any?
+    console.log('REDUX - catch error.response', error.response)
+    throw new Error(JSON.stringify(error.response.data))
+  }
 })
 
 export const fetchAuthMe = createAsyncThunk('auth/fetchAuthMe', async () => {

@@ -2,7 +2,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import React, { Fragment, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
-import { authParams, checkIsAuth, fetchUserData, UserDataType } from '../../redux/slices/authSlice'
+import { authParams, checkIsAuth, fetchUserData } from '../../redux/slices/authSlice'
 import { useAppDispatch } from '../../redux/store'
 
 interface LoginProps {
@@ -26,13 +26,16 @@ const LoginModal = ({ isLoginOpen, setLoginIsOpen }: LoginProps) => {
   const {
     register,
     handleSubmit,
-    // setError,
+    setError,
+    clearErrors,
     formState: { errors }
     // formState
   } = useForm({
     defaultValues: {
-      email: 'johndoe@test.com',
-      password: '12345z2'
+      // email: 'johndoe@test.com',
+      email: 'johndoe22@test.com',
+      password: '12345z2',
+      undefined: ''
 
       // wrong email:
       // POST http://localhost:4444/auth/login 500 (Internal Server Error)
@@ -66,33 +69,63 @@ const LoginModal = ({ isLoginOpen, setLoginIsOpen }: LoginProps) => {
     }
   })
 
+  console.log({ errors })
+
   const onSubmit = async (values: authParams) => {
     // console.log(values)
     // {email: 'dfsdfsdf@dsfsd', password: 'sdfsdfsdfsd'}
     // email:"dfsdfsdf@dsfsd"
     // password:"sdfsdfsdfsd"
     // dispatch(fetchUserData(values))
+    try {
+      // const data = await dispatch(fetchUserData(values))
+      const data = await dispatch(fetchUserData(values)).unwrap()
+      console.log('on submit payload data await', data)
+      // avatarUrl: 'https://www.resetera.com/forums/etcetera-forum.9/z'
+      // createdAt: '2022-10-03T17:52:04.346Z'
+      // email: 'johndoe@test.com'
+      // fullName: 'John Doe'
+      // token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzNiMjE0NGFkMjYzNTY4ZWUwZmZmNjkiLCJpYXQiOjE2NjU0MDAwMzgsImV4cCI6MTY2Nzk5MjAzOH0.r8n7fAMj-3xkdHckd5hkOSxqs7s7UWyaEyp-RjKup-U'
+      // updatedAt: '2022-10-03T17:52:04.346Z'
+      // __v: 0
+      // _id: '633b2144ad263568ee0fff69'
 
-    const data = await dispatch(fetchUserData(values))
-    console.log('on submit payload data await', data)
-    // avatarUrl: 'https://www.resetera.com/forums/etcetera-forum.9/z'
-    // createdAt: '2022-10-03T17:52:04.346Z'
-    // email: 'johndoe@test.com'
-    // fullName: 'John Doe'
-    // token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzNiMjE0NGFkMjYzNTY4ZWUwZmZmNjkiLCJpYXQiOjE2NjU0MDAwMzgsImV4cCI6MTY2Nzk5MjAzOH0.r8n7fAMj-3xkdHckd5hkOSxqs7s7UWyaEyp-RjKup-U'
-    // updatedAt: '2022-10-03T17:52:04.346Z'
-    // __v: 0
-    // _id: '633b2144ad263568ee0fff69'
+      // const payload = data.payload as UserDataType // ! to use server backend error msg -> unwrap() different structure now -> no .payload?
 
-    const payload = data.payload as UserDataType
+      if (!data) {
+        alert('Failed to authorize1?')
+      }
+      // ! to use server backend error msg -> unwrap() different structure now -> no .payload?
+      // if (!payload) {
+      //   alert('Failed to authorize2?') // error
+      // }
 
-    if (!payload) {
-      alert('Failed to authorize')
-    }
+      // save token to localStorage
+      if ('token' in data) {
+        window.localStorage.setItem('token', data.token)
+      }
+      // ! to use server backend error msg -> unwrap() different structure now -> no .payload?
+      // if ('token' in payload) {
+      //   window.localStorage.setItem('token', payload.token)
+      // }
+    } catch (error: any) {
+      console.log('Modal error message:', JSON.parse(error.message))
+      // Modal error message: {msg: 'User not found'}
+      // msg: "User not found"
 
-    // save token to localStorage
-    if ('token' in payload) {
-      window.localStorage.setItem('token', payload.token)
+      const errorArr = JSON.parse(error.message)
+
+      console.log({ errorArr })
+      //   {
+      //     "errorArr": {
+      //         "msg": "Unable to login"
+      //     }
+      // }
+      // setError(err.param, {
+      setError('undefined', {
+        type: 'server',
+        message: errorArr.msg
+      })
     }
   }
 
@@ -131,7 +164,13 @@ const LoginModal = ({ isLoginOpen, setLoginIsOpen }: LoginProps) => {
               <Dialog.Title className='text-center mb-8 text-indigo-600 text-3xl font-bold'>
                 Login
               </Dialog.Title>
-              <form className='flex flex-col' onSubmit={handleSubmit(onSubmit)}>
+              <form
+                className='flex flex-col'
+                onSubmit={(e) => {
+                  clearErrors() // to keep form register submit attempt work after 1st error otherwise stops submitting
+                  handleSubmit(onSubmit)(e)
+                }}
+              >
                 <div className='mb-6 relative'>
                   {/* Email input */}
                   <label
@@ -178,6 +217,12 @@ const LoginModal = ({ isLoginOpen, setLoginIsOpen }: LoginProps) => {
                     </p>
                   )}
                 </div>
+                {/* error undefined (when submit -> email/password wrong -> server error msg) */}
+                {errors?.undefined && (
+                  <p className='text-red-600 tracking-wider ml-4 mt-2'>
+                    {errors.undefined.message}
+                  </p>
+                )}
                 <button
                   type='submit'
                   // onClick={() => setLoginIsOpen(false)}
