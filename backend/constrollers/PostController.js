@@ -1,9 +1,9 @@
-import PostModel from "../models/Post.js";
+import PostModel from '../models/Post.js'
 
 export const getAll = async (req, res) => {
   try {
-    const posts = await PostModel.find().populate("user").exec();
-    res.json(posts);
+    const posts = await PostModel.find().populate('user').exec()
+    res.json(posts)
     // {
     //     "_id": "633c274f32b76695bd10415d",
     //     "title": "Title title title2",
@@ -33,51 +33,51 @@ export const getAll = async (req, res) => {
     // }
     // ]
   } catch (error) {
-    console.log(err);
+    console.log(err)
     res.status(500).json({
-      message: "Failed to load all posts",
-    });
+      message: 'Failed to load all posts'
+    })
   }
-};
+}
 
 export const getOne = async (req, res) => {
   try {
-    const postId = req.params.id; // from dynamic url /:id
+    const postId = req.params.id // from dynamic url /:id
 
     PostModel.findOneAndUpdate(
       {
-        _id: postId, // ?
+        _id: postId // ?
       },
       {
         // increment view count
         $inc: {
-          viewsCount: 1,
-        },
+          viewsCount: 1
+        }
       },
       {
-        returnDocument: "after", // return document after update / all done
+        returnDocument: 'after' // return document after update / all done
       },
       (err, doc) => {
         // actions to take:
 
         // if error
         if (err) {
-          console.log(err);
+          console.log(err)
           // add 'return' to stop future code
           return res.status(500).json({
-            message: "Failed to get post",
-          });
+            message: 'Failed to get post'
+          })
         }
 
         // check for undefined? -> return error
         if (!doc) {
           return res.status(404).json({
-            message: "Post not found",
-          });
+            message: 'Post not found'
+          })
         }
 
         // if all ok:
-        res.json(doc);
+        res.json(doc)
       }
       // {
       // 	"_id": "633c63256e0976b7ba3b17e9",
@@ -94,35 +94,35 @@ export const getOne = async (req, res) => {
       // 	"__v": 0,
       // 	"viewsCount": 4
       // }
-    );
+    ).populate('user') // show user name when open post page?
   } catch (error) {
-    console.log(error);
+    console.log(error)
     res.status(500).json({
-      message: "Failed to get post",
-    });
+      message: 'Failed to get post'
+    })
   }
-};
+}
 
 export const create = async (req, res) => {
   try {
-    console.log(req.body);
+    console.log(req.body)
 
     const doc = new PostModel({
       user: req.userId, // ! user not from body
       title: req.body.title,
       body: req.body.body,
       tags: req.body.tags,
-      imageUrl: req.body.imageUrl,
-    });
+      imageUrl: req.body.imageUrl
+    })
 
     // save post / document to mongoDB
-    const post = await doc.save();
+    const post = await doc.save()
 
     // if all ok:
     res.json({
       success: true,
-      post,
-    });
+      post
+    })
     // {
     //   "success": true,
     //   "post": {
@@ -140,20 +140,20 @@ export const create = async (req, res) => {
     //     "__v": 0
     // }
   } catch (error) {
-    console.log(error);
+    console.log(error)
     res.status(500).json({
-      message: "unable to create post",
-    });
+      message: 'unable to create post'
+    })
   }
-};
+}
 
 export const update = async (req, res) => {
   try {
-    const postId = req.params.id; // get id from dynamic url /:id (id of which one want to update)
+    const postId = req.params.id // get id from dynamic url /:id (id of which one want to update)
 
     await PostModel.updateOne(
       {
-        _id: postId, // ?
+        _id: postId // ?
       },
       {
         // what want to update:
@@ -161,66 +161,66 @@ export const update = async (req, res) => {
         body: req.body.body,
         user: req.userId,
         imageUrl: req.body.imageUrl,
-        tags: req.body.tags,
+        tags: req.body.tags
       }
-    );
+    )
     // if all ok:
     res.json({
       success: true,
-      message: "post updated",
-    });
+      message: 'post updated'
+    })
   } catch (error) {
-    console.log(error);
+    console.log(error)
     res.status(500).json({
-      message: "Failed to update post",
-    });
+      message: 'Failed to update post'
+    })
   }
-};
+}
 
 export const remove = async (req, res) => {
   try {
-    const postId = req.params.id;
+    const postId = req.params.id
 
     PostModel.findOneAndDelete(
       {
-        _id: postId, // ?
+        _id: postId // ?
       },
       (err, doc) => {
         // actions to take:
 
         // if error
         if (err) {
-          console.log(err);
+          console.log(err)
           return res.status(500).json({
-            message: "Failed to delete",
-          });
+            message: 'Failed to delete'
+          })
         }
 
         // check for undefined? -> return error
         if (!doc) {
-          console.log(err);
+          console.log(err)
           return res.status(500).json({
-            message: "Post not found",
-          });
+            message: 'Post not found'
+          })
         }
 
         // if all ok:
         res.json({
           success: true,
-          message: "post deleted",
-          id: postId,
-        });
+          message: 'post deleted',
+          id: postId
+        })
         // {
         //   "success": true,
         //   "message": "post deleted",
         //   "id": "633c0d15fc3ad36ed70368dd"
         // }
       }
-    );
+    )
   } catch (error) {
-    console.log(error);
+    console.log(error)
     res.status(500).json({
-      message: "Failed to delete post",
-    });
+      message: 'Failed to delete post'
+    })
   }
-};
+}

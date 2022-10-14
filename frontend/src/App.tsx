@@ -4,6 +4,7 @@ import FullPost from './pages/FullPost/FullPost'
 import Home from './pages/Home/Home'
 
 import { Route, Routes } from 'react-router-dom'
+import CreatePost from './pages/CreatePost/CreatePost'
 import { fetchAuthMe } from './redux/slices/authSlice'
 import { useAppDispatch } from './redux/store'
 
@@ -34,6 +35,7 @@ const App = () => {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/posts/:id' element={<FullPost />} />
+          <Route path='/posts/create' element={<CreatePost />} />
         </Routes>
       </div>
     </>
