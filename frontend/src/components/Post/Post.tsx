@@ -6,14 +6,13 @@ import { PostType } from '../../redux/slices/postsSlice'
 const Post = ({
   _id,
   title,
-  bodyText,
+  body,
   imageUrl,
   user,
   createdAt,
   viewsCount,
   tags,
-  isFullPost,
-  index
+  isFullPost
 }: PostType) => {
   return (
     <article className={`bg-white rounded shadow-sm ${isFullPost ? 'mt-12' : ''}`}>
@@ -26,6 +25,7 @@ const Post = ({
         />
       )}
       <div className='post-content p-6 flex items-start'>
+        {/* <img src={user.avatarUrl} alt='' className='mt-1.5 mr-3.5' /> */}
         <div className='bg-slate-600 text-white font-extrabold rounded-full min-h-[2rem] min-w-[2rem] mt-1.5 mr-3.5 text-center leading-8'>
           D
         </div>
@@ -43,7 +43,7 @@ const Post = ({
               title
             )}
           </h2>
-          <p>{bodyText}</p>
+          <p>{body}</p>
           <div className='tags relative -left-4'>
             <ul className='flex gap-4 flex-wrap text-gray-500'>
               {tags.map((tag, idx) => (

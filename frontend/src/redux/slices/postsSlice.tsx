@@ -5,7 +5,7 @@ import axios from '../../axios/axios'
 export interface PostType {
   _id: string
   title: string
-  bodyText: string
+  body: string
   imageUrl: string
   user: {
     avatarUrl: string
