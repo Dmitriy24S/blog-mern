@@ -31,7 +31,7 @@ const App = () => {
   return (
     <>
       <Header />
-      <div className='wrapper max-w-6xl mx-auto px-4'>
+      <div className='wrapper max-w-6xl mx-auto px-4 pb-20'>
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/posts/:id' element={<FullPost />} />
