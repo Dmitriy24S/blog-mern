@@ -43,14 +43,26 @@ const CreatePost = () => {
     setImageUrl('')
   }
 
+  const splitTags = tags.split(',').map((element) => element.trim()) // split string into separate tags & remove white space
+  console.log(splitTags) // ["test", "fdkflsmdf  fsdm", "fsdf sdfds", "fsdf s", "df"] (5)
+  //   [Log] ["test 5", "test 5", "test5"] (3) (CreatePost.tsx, line 54)
+
   const handleSubmit = async () => {
     try {
       const fields = {
         title,
-        tags,
+        tags: splitTags,
         body,
         imageUrl
       }
+
+      console.log('fields', { fields })
+      //   fields: Object
+      //   body: 'text 4'
+      //   imageUrl: ''
+      //   tags: ['test', 'fdkflsmdf fsdm', 'fsdf sdfds', 'fsdf s', 'df', 'fdfdfdfdfdf'](6)
+      //   title: 'test 4'
+
       setIsLoading(true)
       const { data } = await axios.post('/posts', fields)
       console.log('data submit await', data)
@@ -63,6 +75,12 @@ const CreatePost = () => {
     } catch (error) {
       setIsLoading(false)
       console.warn('submit catch error:', error)
+      // ! when only title and tags text error in console example:
+      // Failed to load resource: the server responded with a status of 400 (Bad Request)
+      // response: Object
+      // config: {transitional: {silentJSONParsing: true, forcedJSONParsing: true, clarifyTimeoutError: false}, adapter: function, transformRequest: Array, transformResponse: Array, timeout: 0, …}
+      // data: Array (1)
+      // 0 {value: "", msg: "Enter body text", param: "body", location: "body"}
       alert('Error when submitting post')
     }
   }
