@@ -1,6 +1,8 @@
 /* eslint-disable multiline-ternary */
 import React from 'react'
+import ReactMarkdown from 'react-markdown'
 import { Link } from 'react-router-dom'
+import remarkGfm from 'remark-gfm'
 import { PostType } from '../../redux/slices/postsSlice'
 
 const Post = ({
@@ -29,7 +31,7 @@ const Post = ({
         <div className='bg-slate-600 text-white font-extrabold rounded-full min-h-[2rem] min-w-[2rem] mt-1.5 mr-3.5 text-center leading-8'>
           D
         </div>
-        <div className='flex flex-col gap-3'>
+        <div className='flex flex-col gap-3 overflow-auto'>
           <div className='blog-top mb-1'>
             <div className='name font-bold'>{user.fullName}</div>
             <div className='time text-gray-500 text-sm'>{createdAt}</div>
@@ -43,7 +45,10 @@ const Post = ({
               title
             )}
           </h2>
-          <p>{body}</p>
+          {/* <p>{body}</p> */}
+          <ReactMarkdown className='prose' remarkPlugins={[remarkGfm]}>
+            {body}
+          </ReactMarkdown>
           <div className='tags relative -left-4'>
             <ul className='flex gap-4 flex-wrap text-gray-500'>
               {tags.map((tag, idx) => (
