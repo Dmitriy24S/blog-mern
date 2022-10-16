@@ -122,7 +122,6 @@ export const authSlice = createSlice({
     builder.addCase(registerUser.rejected, (state) => {
       state.userData = null
       state.status = 'error'
-      //   mess returnnug msg i kak coplete mess login fake mes nado kakto hz fk
     })
   }
 })

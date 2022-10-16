@@ -54,6 +54,16 @@ export const fetchTags = createAsyncThunk('posts/fetchTags', async () => {
   return data
 })
 
+export const fetchRemovePost = createAsyncThunk(
+  'posts/fetchRemovePost',
+  async (id: string) => {
+    const { data } = await axios.delete(`/posts/${id}`)
+    console.log('async delete post data', data)
+    // {success: true, message: 'post deleted', id: '6349710a61699bf7a6e17614'}
+  }
+  // async (id: string) => await axios.delete(`/posts/${id}`)
+)
+
 export const postsSlice = createSlice({
   name: 'posts',
   initialState,
@@ -66,16 +76,33 @@ export const postsSlice = createSlice({
     // },
   },
   extraReducers: (builder) => {
+    // fetchPosts
     builder.addCase(fetchPosts.fulfilled, (state, action) => {
       const data: PostType[] = [...action.payload]
       state.posts.items = data
       console.log('fetch posts redux', data, 111111)
       state.posts.status = 'done'
     })
+    // fetchTags
     builder.addCase(fetchTags.fulfilled, (state, action) => {
       const data = [...action.payload]
       state.tags.items = data
       state.tags.status = 'done'
+    })
+    // fetchRemovePost
+    builder.addCase(fetchRemovePost.fulfilled, (state, action) => {
+      console.log('postsSlice DELETING POST?', 'action:', action)
+      // {
+      //     "type": "posts/fetchRemovePost/fulfilled",
+      //     "meta": {
+      //         "arg": "6349710a61699bf7a6e17614", // this is post id?
+      //         "requestId": "b1Ge3fDomXLdrSB_jr3xa",
+      //         "requestStatus": "fulfilled"
+      //     }
+      // }
+      // payload undefined?
+      const id = String(action.meta.arg)
+      state.posts.items = state.posts.items.filter((item) => item._id !== id)
     })
   }
 })

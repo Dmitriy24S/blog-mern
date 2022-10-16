@@ -3,7 +3,8 @@ import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Link } from 'react-router-dom'
 import remarkGfm from 'remark-gfm'
-import { PostType } from '../../redux/slices/postsSlice'
+import { fetchRemovePost, PostType } from '../../redux/slices/postsSlice'
+import { useAppDispatch } from '../../redux/store'
 
 const Post = ({
   _id,
@@ -17,6 +18,8 @@ const Post = ({
   isFullPost,
   isEditable
 }: PostType) => {
+  const dispatch = useAppDispatch()
+
   return (
     <article className={`relative bg-white rounded shadow-sm ${isFullPost ? 'mt-12' : ''}`}>
       {isEditable && (
@@ -32,7 +35,7 @@ const Post = ({
             className='bg-white shadow'
             onClick={() => {
               if (window.confirm('Are you sure you want to delete this post?')) {
-                // dispatch(fetchRemovePost(_id))
+                dispatch(fetchRemovePost(_id))
                 console.log('deleting post:', _id)
               }
             }}
