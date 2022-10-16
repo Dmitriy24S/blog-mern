@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import axios from '../../axios/axios'
 import Post from '../../components/Post/Post'
 import PostSkeleton from '../../components/Post/PostSkeleton'
 import { PostType } from '../../redux/slices/postsSlice'
+import { RootState } from '../../redux/store'
 
 const FullPost = () => {
   const params = useParams()
@@ -11,6 +13,10 @@ const FullPost = () => {
 
   const [fullPostData, setFullPostData] = useState<PostType>()
   const [isLoading, setIsLoading] = useState(true)
+
+  // check current logged in user -> is post author? -> editable post
+  const userData = useSelector((state: RootState) => state.user.userData)
+  console.log({ userData })
 
   useEffect(() => {
     const fetchSinglePostData = async () => {
@@ -48,7 +54,6 @@ const FullPost = () => {
       {fullPostData && (
         <Post
           _id={fullPostData._id}
-          index={1}
           title={fullPostData.title}
           body={
             fullPostData.body ||
@@ -69,6 +74,7 @@ const FullPost = () => {
           viewsCount={fullPostData.viewsCount}
           tags={fullPostData.tags}
           isFullPost={true}
+          isEditable={userData?._id === fullPostData.user._id} // if logged in user same as post author -> enable/show editing
         />
       )}
     </>

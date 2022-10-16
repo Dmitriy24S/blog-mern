@@ -10,12 +10,13 @@ export interface PostType {
   user: {
     avatarUrl: string
     fullName: string
+    _id?: string
   }
   createdAt: string
   viewsCount: number
   tags: string[]
   isFullPost: boolean
-  index?: number
+  isEditable: boolean
 }
 
 export interface PostsSliceInitialStateType {

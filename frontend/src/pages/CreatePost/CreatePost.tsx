@@ -1,12 +1,18 @@
 import 'easymde/dist/easymde.min.css'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import SimpleMDE from 'react-simplemde-editor'
 import axios from '../../axios/axios'
 import { checkIsAuth } from '../../redux/slices/authSlice'
+import { RootState } from '../../redux/store'
 
 const CreatePost = () => {
+  // check for post id -> get post data -> edit post mode
+  const { id } = useParams()
+  console.log('useparams id:', id)
+  const isEditing = Boolean(id)
+
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
@@ -64,13 +70,18 @@ const CreatePost = () => {
       //   title: 'test 4'
 
       setIsLoading(true)
-      const { data } = await axios.post('/posts', fields)
+      const { data } = isEditing
+        ? await axios.patch(`/posts/${id}`, fields)
+        : await axios.post('/posts', fields)
+
       console.log('data submit await', data)
       //   [Log] data submit await – {success: true, post: Object}
       // {success: true, post: Object}
       //   post: {title: "Title 2", body: "Body Text 2", user: "6346935cdc974e1cc7cda2e9", tags: ["tag 2"], imageUrl: "uploads/1.jpg", …}
+
       // Get id of new post -> redirect to post page with this id
-      const postId = data.post._id
+      // const postId = data.post._id
+      const postId = isEditing ? id : data.post._id
       navigate(`/posts/${postId}`)
     } catch (error) {
       setIsLoading(false)
@@ -117,6 +128,52 @@ const CreatePost = () => {
       Submitting Post
     </h2>
   )
+
+  // check current user for editable posts
+  const userData = useSelector((state: RootState) => state.user.userData)
+  console.log({ userData })
+
+  // on load if id exists -> edit post mode -> fill in values from existing post
+  useEffect(() => {
+    if (id) {
+      axios.get(`/posts/${id}`).then((res) => {
+        console.log('res exisitng post', res)
+        // if not author of posts (e.g. manual url edit link to access edit page) -> redirect to home page
+        if (userData?._id !== res.data.user._id) {
+          console.log('user id ? post user id', userData?._id !== res.data.user._id)
+          navigate('/')
+        }
+        // {data: {…}, status: 200, statusText: 'OK', headers: AxiosHeaders, config: {…},…}
+        // data:
+        //     "_id": "63491375fa8daab6f17588ec",
+        //     "title": "Title 2",
+        //     "body": "Body Text 2",
+        //     "user": {
+        //         "_id": "6346935cdc974e1cc7cda2e9",
+        //         "fullName": "john doe3",
+        //         "email": "johndoe3@test.com",
+        //         "passwordHash": "$2b$10$p4LSmSvphTognfUSCTbz1OvDPVY1pkfP6KsWs7fKW.z76BC6r4k6u",
+        //         "createdAt": "2022-10-12T10:13:48.219Z",
+        //         "updatedAt": "2022-10-12T10:13:48.219Z",
+        //         "__v": 0
+        //     },
+        //     "tags": [
+        //         "tag 2"
+        //     ],
+        //     "imageUrl": "uploads/1.jpg",
+        //     "viewsCount": 12,
+        //     "createdAt": "2022-10-14T07:44:53.435Z",
+        //     "updatedAt": "2022-10-15T20:31:14.062Z",
+        //     "__v": 0
+        // }
+        setImageUrl(res.data.imageUrl)
+        setTitle(res.data.title)
+        // setTags(res.data.tags) // Uncaught TypeError: tags.split is not a function
+        setTags(res.data.tags.join(', '))
+        setBody(res.data.body)
+      })
+    }
+  }, [])
 
   return (
     <form
@@ -204,7 +261,8 @@ const CreatePost = () => {
           Cancel
         </button>
         <button className='bg-indigo-600 text-white hover:bg-indigo-700' type='submit'>
-          Add Post
+          {isEditing ? 'Update Post' : 'Add Post'}
+          {/* Add Post */}
         </button>
       </div>
     </form>

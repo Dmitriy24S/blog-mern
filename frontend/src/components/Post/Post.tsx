@@ -14,10 +14,33 @@ const Post = ({
   createdAt,
   viewsCount,
   tags,
-  isFullPost
+  isFullPost,
+  isEditable
 }: PostType) => {
   return (
-    <article className={`bg-white rounded shadow-sm ${isFullPost ? 'mt-12' : ''}`}>
+    <article className={`relative bg-white rounded shadow-sm ${isFullPost ? 'mt-12' : ''}`}>
+      {isEditable && (
+        <div className='edit-controls absolute right-4 top-3 flex gap-3'>
+          {/* <button className='bg-white shadow' onClick={()=> {}}>Edit</button> */}
+          <Link
+            to={`/posts/${_id}/edit`}
+            className=' hover:text-indigo-600 bg-white shadow rounded-md text-center px-4 py-3'
+          >
+            Edit
+          </Link>
+          <button
+            className='bg-white shadow'
+            onClick={() => {
+              if (window.confirm('Are you sure you want to delete this post?')) {
+                // dispatch(fetchRemovePost(_id))
+                console.log('deleting post:', _id)
+              }
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      )}
       {imageUrl && (
         <img
           // className={clsx(styles.image, { [styles.imageFull]: isFullPost })}

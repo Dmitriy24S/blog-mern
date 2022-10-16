@@ -13,6 +13,10 @@ const Home = () => {
 
   const { posts } = useSelector((state: RootState) => state.posts)
 
+  // check current logged in user for post author? -> editable posts
+  const userData = useSelector((state: RootState) => state.user.userData)
+  console.log({ userData })
+
   // temp
   useEffect(() => {
     console.log('Home posts:', posts)
@@ -39,8 +43,7 @@ const Home = () => {
           {posts &&
             posts.items.map((item: PostType, index) => (
               <Post
-                key={index}
-                index={index}
+                key={item._id}
                 _id={item._id}
                 title={item.title || 'Learn to code #1 | Rock Paper Scissors'}
                 body={
@@ -61,7 +64,30 @@ const Home = () => {
                 viewsCount={item.viewsCount}
                 tags={item.tags}
                 isFullPost={false}
+                isEditable={userData?._id === item.user._id} // if logged in user same as post author -> enable/show editing
               />
+              // "_id": "633c0db4b9888ca0dee235ad",
+              // "title": "Post 1",
+              // "body": "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Molestiae veniam dignissimos ratione, sequi, explicabo officiis expedita velit temporibus placeat sed, aliquid corrupti vel illo magni delectus voluptate? Cupiditate, magnam blanditiis",
+              // "tags": [
+              //     "react",
+              //     "node"
+              // ],
+              // "viewerCount": 0,
+              // "createdAt": "2022-10-04T10:40:52.683Z",
+              // "updatedAt": "2022-10-15T06:28:49.054Z",
+              // "__v": 0,
+              // "user": {
+              //     "_id": "633b2144ad263568ee0fff69",
+              //     "fullName": "John Doe",
+              //     "email": "johndoe@test.com",
+              //     "passwordHash": "$2b$10$p5tziVTN2uleAQVDWlkbfehGenWZ4Ua.dP3wDuZ1A4H5FNrlR80.G",
+              //     "avatarUrl": "https://www.resetera.com/forums/etcetera-forum.9/z",
+              //     "createdAt": "2022-10-03T17:52:04.346Z",
+              //     "updatedAt": "2022-10-03T17:52:04.346Z",
+              //     "__v": 0
+              // },
+              // "viewsCount": 49
             ))}
         </div>
         <TagsBlock />

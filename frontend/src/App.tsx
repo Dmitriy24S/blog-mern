@@ -35,6 +35,7 @@ const App = () => {
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/posts/:id' element={<FullPost />} />
+          <Route path='/posts/:id/edit' element={<CreatePost />} />
           <Route path='/posts/create' element={<CreatePost />} />
         </Routes>
       </div>
