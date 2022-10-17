@@ -57,7 +57,7 @@ const Post = ({
         <div className='bg-slate-600 text-white font-extrabold rounded-full min-h-[2rem] min-w-[2rem] mt-1.5 mr-3.5 text-center leading-8'>
           D
         </div>
-        <div className='flex flex-col gap-3 overflow-auto'>
+        <div className='flex flex-col gap-3 overflow-auto break-words'>
           <div className='blog-top mb-1'>
             <div className='name font-bold'>{user.fullName}</div>
             <div className='time text-gray-500 text-sm'>{createdAt}</div>
@@ -71,10 +71,32 @@ const Post = ({
               title
             )}
           </h2>
-          {/* <p>{body}</p> */}
-          <ReactMarkdown className='prose' remarkPlugins={[remarkGfm]}>
-            {body}
-          </ReactMarkdown>
+          {!isFullPost ? (
+            <p>
+              {body}
+              {/* Read more link on post preview  */}
+              <span className='ml-1'>
+                {body.length > 149 && (
+                  <Link to={`/posts/${_id}`} className='font-bold hover:text-indigo-600 text-end'>
+                    ...Read more
+                  </Link>
+                )}
+              </span>
+            </p>
+          ) : (
+            // ! markdown transforms '...' text -> not markdown preview text?
+            <ReactMarkdown className='prose' remarkPlugins={[remarkGfm]}>
+              {body}
+            </ReactMarkdown>
+          )}
+
+          {/* Read more link on post preview  */}
+          {/* {!isFullPost && body.length > 50 && ( */}
+          {/* <Link to={`/posts/${_id}`} className='font-bold hover:text-indigo-600 text-end'> */}
+          {/* ...Read more */}
+          {/* </Link> */}
+          {/* )} */}
+
           <div className='tags relative -left-4'>
             <ul className='flex gap-4 flex-wrap text-gray-500'>
               {tags.map((tag, idx) => (
@@ -85,6 +107,7 @@ const Post = ({
             </ul>
           </div>
           <div className='blog-bottom flex gap-4'>
+            {/* views count: */}
             <div className='flex items-center gap-1 text-gray-500 fill-gray-500'>
               <svg
                 className='w-4 h-4'
@@ -97,6 +120,7 @@ const Post = ({
               </svg>
               {viewsCount}
             </div>
+            {/* comments amount: */}
             <button className='hover:bg-gray-100 flex items-center gap-1 text-gray-500 fill-gray-500'>
               <svg
                 className='w-4 h-4'

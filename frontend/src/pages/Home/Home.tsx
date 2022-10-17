@@ -30,6 +30,7 @@ const Home = () => {
 
   const isPostsLoading = posts.status === 'loading'
   // const finalPosts = posts.items || [...Array(4)]
+  // const previewBodyText = !isFullPost && body.length > 50 ? body + '...' : body
 
   return (
     <div className='home p-4'>
@@ -40,14 +41,20 @@ const Home = () => {
           {isPostsLoading &&
             [...Array(4)].map((_item, idx) => <PostSkeleton key={idx} isFullPost={false} />)}
           {/* If have posts -> show posts */}
-          {posts &&
-            posts.items.map((item: PostType, index) => (
+          {posts?.items.map((item: PostType, index) => {
+            // const previewBodyText =
+            // item.body.length > 50 ? item.body.substring(0, 100) + '...' : item.body
+
+            return (
               <Post
                 key={item._id}
                 _id={item._id}
                 title={item.title || 'Learn to code #1 | Rock Paper Scissors'}
                 body={
-                  item.body ||
+                  // preview post body text:
+                  // previewBodyText ||
+                  // item.body.substring(0, 150) + '...' || // ! markdown transforms '...' text
+                  item.body.substring(0, 150) ||
                   'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Molestiae veniam dignissimos ratione, sequi, explicabo officiis expedita velit temporibus placeat sed, aliquid corrupti vel illo magni delectus voluptate? Cupiditate, magnam blanditiis'
                 }
                 imageUrl={
@@ -88,7 +95,8 @@ const Home = () => {
               //     "__v": 0
               // },
               // "viewsCount": 49
-            ))}
+            )
+          })}
         </div>
         <TagsBlock />
       </div>
